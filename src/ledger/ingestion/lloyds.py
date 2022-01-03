@@ -1,6 +1,5 @@
 from datetime import date
 
-from ledger import reverse_enumerate
 from ledger.ingestion import Ingestor
 from ledger.transaction import Transaction, TransactionType
 

@@ -11,12 +11,9 @@ class AmexIngestor(Ingestor):
         return [d[0]] + list(reversed(d[1:]))
 
     def _find_last_balance(self, data):
-        """ I pay off the credit card on the ~27th each month, paying off the balance for the period
-            starting the previous month on the 14th and ending on the current month on the 13th.
-
-            In other words, the most recent pay-off of the credit card represents the balance at the
-            transaction before, and closest to, the 13th of the current month. We can then extrapolate
-            this out on both sides to find the balance of all transactions.
+        """ The most recent pay-off of the credit card represents the balance at the transaction before, and closest to,
+            the end of the billing period of the current month. We can use this to extrapolate this out on both sides
+            to find the balance of all transactions.
         """
         for i, v in reverse_enumerate(data):
             formatted = self._get_data_from_line(v)
@@ -62,11 +59,9 @@ class AmexIngestor(Ingestor):
         super(AmexIngestor, self).ingest()
         transactions = []
         last_index, last_amount, last_balance = self._find_last_balance(self.data)
-        print(f"at {last_index}, spent {last_amount} to reach a balance of {last_balance}")
         cur_index = last_index
         cur_amount = last_amount
         cur_balance = last_balance
-        print(f"cur balance is {cur_balance}")
         # Extrapolate backwards
         while cur_index > 0:
             print(f"{cur_index}: {self.data[cur_index]}")
