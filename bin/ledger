@@ -1,0 +1,58 @@
+#!/usr/bin/python3
+import argparse
+from ledger.command import Command
+
+def run_command(command, extra_args):
+    # print(f"Running {command} {extra_args}")
+    inst = get_command_class(command)
+    if not inst:
+        raise RuntimeError(
+            f"Could not find a suitable command class for {command}! Please use one of "
+            f"{', '.join(', '.join(c.names) for c in Command.allSubclasses())}. Please use "
+            f"ledger -h for more information."
+        )
+    inst(extra_args)
+
+def get_command_class(command):
+    for cls in Command.allSubclasses():
+        inst = cls()
+        if inst.match(command):
+            return inst
+
+def show_help():
+    hlen = 100
+    line = "#" * hlen
+    for cls in sorted(Command.allSubclasses(), key=lambda x: x.names[0]):
+        name = cls.names[0]
+        midlen = "#" * (hlen//2 - len(name)//2 - 1)
+        midline = f"{midlen} {name} {midlen}"[:hlen]
+        print(line)
+        print(line)
+        print(midline)
+        print(line)
+        print(line)
+        #Nice
+        print(cls.help)
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(
+        description="Ingest data from csv bank statements and produce collective info.",
+        add_help=False
+    )
+    parser.add_argument(
+        "command",
+        type=str,
+        choices=sum([list(c.names) for c in Command.allSubclasses()], []),
+        nargs="?"
+    )
+    parser.add_argument("--help", "-h", action="store_true", help="Show this help message and exit.")
+
+    args, unknown_args = parser.parse_known_args()
+    if args.command:
+        if args.help:
+            unknown_args.append("--help")
+        run_command(args.command, unknown_args)
+    elif args.help:
+        show_help()
+    else:
+        print("Usage ledger <command>. Add the -h flag to see available commands.")
