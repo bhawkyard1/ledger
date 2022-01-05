@@ -21,8 +21,6 @@ class LLoydsIngestor(Ingestor):
     def _convert_decimal(self, val: str) -> int:
         """ Converts a decimal string to an int representing pennies. """
         spl = val.split(".")
-        if len(spl) < 2:
-            raise RuntimeError(f"Invalid value provided to convert: '{val}'!")
         total = int(spl[0] or "0") * 100
         if len(spl) > 1:
             total += int(spl[1])
