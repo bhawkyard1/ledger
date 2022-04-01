@@ -14,6 +14,10 @@ class AmexIngestor(Ingestor):
         """ The most recent pay-off of the credit card represents the balance at the transaction before, and closest to,
             the end of the billing period of the current month. We can use this to extrapolate this out on both sides
             to find the balance of all transactions.
+
+            This can get tricky because I think the cut off for the billing is not at midnight at the end of the billing
+            period, seeing some situations where there are multiple transactions on the final day of the billing period
+            and stuff doesn't add up if we take the final transaction as the key one.
         """
         for i, v in reverse_enumerate(data):
             formatted = self._get_data_from_line(v)
@@ -60,7 +64,6 @@ class AmexIngestor(Ingestor):
         transactions = []
         last_index, last_amount, last_balance = self._find_last_balance(self.data)
         cur_index = last_index
-        cur_amount = last_amount
         cur_balance = last_balance
         # Extrapolate backwards
         while cur_index > 0:

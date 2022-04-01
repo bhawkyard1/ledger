@@ -23,6 +23,8 @@ class LLoydsIngestor(Ingestor):
         spl = val.split(".")
         total = int(spl[0] or "0") * 100
         if len(spl) > 1:
+            if len(spl[1]) == 1:
+                spl[1] += "0"
             total += int(spl[1])
         return total
 
@@ -61,8 +63,7 @@ class LLoydsIngestor(Ingestor):
 
     @property
     def suitable(self) -> bool:
-        return (
-            self.data[0] ==
+        return self.data[0].startswith(
             "Transaction Date,Transaction Type,Sort Code,Account Number,Transaction Description,Debit Amount,Credit "
             "Amount,Balance"
         )

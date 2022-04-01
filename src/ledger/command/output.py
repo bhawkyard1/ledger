@@ -25,7 +25,7 @@ class Output(Command):
                 " OR ".join(f"uid=\"{uid}\"" for uid in chunk or [""])
             )
         data = []
-        for t in sorted(transactions):
+        for t in sorted(transactions, key=lambda x: tuple(getattr(x, k) for k in args.sort_by)):
             nice_account = get_config_value(["account_names", t.account], t.account)
             nice_description = get_config_value(["account_names", t.description], t.description)
             format_dict = {
@@ -60,6 +60,18 @@ class Output(Command):
             help="The string to use to format the output.",
             default="{date}: {input} -> {amount} -> {output} ({account} = {balance})",
             nargs="?"
+        )
+        parser.add_argument(
+            "--sort-by",
+            type=str,
+            nargs="*",
+            help="The properties to sort the output by.",
+            default=["date", "idx"],
+            choices=([
+                "date",
+                "idx",
+                "amount"
+            ])
         )
         parser.add_argument(
             "transaction_ids",

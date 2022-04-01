@@ -25,7 +25,7 @@ class Balance(Command):
             self._get_balance_between_dates(start, end, args.delta_amount, args.delta_unit)
 
     def get_relevant_transactions_for_date(self, date):
-        transactions = Transaction.filter(f"date<\"{date}\"")
+        transactions = Transaction.filter(f"date<=\"{date}\"")
         by_account = defaultdict(list)
         for t in transactions:
             by_account[t.account].append(t)
