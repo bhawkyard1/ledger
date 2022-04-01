@@ -53,3 +53,4 @@ from ledger.ingestion import lloyds
 from ledger.ingestion import nationwide
 from ledger.ingestion import premium_bonds
 from ledger.ingestion import vanguard
+from ledger.ingestion import skipton
