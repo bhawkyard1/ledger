@@ -4,7 +4,7 @@ import datetime
 from collections import defaultdict
 from datetime import date
 
-from ledger import get_date_from_string, pence_to_pounds, classproperty, print_columns, daterange, date_subtract_delta
+from ledger import get_date_from_string, pence_to_pounds, classproperty, print_columns, daterange, date_subtract_delta, TextColor
 from ledger.command import Command
 from ledger.config import get_config_value
 from ledger.transaction import Transaction
@@ -55,27 +55,34 @@ class GetSpending(Command):
                 f"date==\"{start}\""
             )
         spending_by_account = defaultdict(int)
+        running_total = 0
         for t in sorted(relevant_transactions):
-            if t.amount < 0 and not t.is_internal:
+            if(
+                t.amount < 0 and
+                not t.is_internal and
+                t.description not in get_config_value(["non_spending_outgoing_accounts"], [])
+            ):
+                running_total -= t.amount
                 if print_details:
-                    print(f"ADDING: {t}")
-                spending_by_account[t.nice_account_name] += t.amount
+                    print(f"{TextColor.FAIL.value}ADDING:   {t} : {pence_to_pounds(running_total)}")
+                spending_by_account[t.nice_account_name] -= t.amount
             elif t.description in get_config_value(["payback_descriptions"]):
+                running_total -= t.amount
                 if print_details:
-                    print(f"PAYBACK: {t}")
-                spending_by_account[t.nice_account_name] += t.amount
+                    print(f"{TextColor.OKGREEN.value}PAYBACK:  {t} : {pence_to_pounds(running_total)}")
+                spending_by_account[t.nice_account_name] -= t.amount
             elif print_details:
-                print(f"IGNORING: {t}")
+                print(f"{TextColor.ENDC.value}IGNORING: {t} : {pence_to_pounds(running_total)}")
 
         data = []
         # print(spending_by_account)
         if print_accounts:
             for acct, spending in sorted(spending_by_account.items()):
                 data.append(
-                    [f"{acct}:", pence_to_pounds(-spending)]
+                    [f"{acct}:", pence_to_pounds(spending)]
                 )
 
-        spending_total = sum([-min(x, 0) for x in spending_by_account.values()])
+        spending_total = sum(spending_by_account.values())
         data.append([
             f"{start} - {end} TOTAL:", pence_to_pounds(spending_total)
         ])

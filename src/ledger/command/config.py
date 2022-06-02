@@ -63,5 +63,5 @@ class Config(Command):
             for arg in values:
                 remove_config_value(arg.split(":"))
         else:
-            raise RuntimeError(f"First argument must be '+' or '-' but here it is '{first}'!")
+            raise RuntimeError(f"First argument must be '+' or '-' but here it is '{add_or_remove}'!")
 

@@ -50,6 +50,7 @@ class Ingest(Command):
 
 from ledger.ingestion import amex
 from ledger.ingestion import lloyds
+from ledger.ingestion import lloyds_credit
 from ledger.ingestion import nationwide
 from ledger.ingestion import premium_bonds
 from ledger.ingestion import vanguard

@@ -8,9 +8,8 @@ class Skipton(Ingestor):
     def ingest(self):
         transactions = []
         for idx, line in enumerate(reversed(self.data[1:])):
-            print(repr(line),[x for x in line.split("\t") if x])
-            datestr, desc, pay_in, pay_out, balance = [x for x in line.split("\t") if x]
-            day, month, year = datestr.split("/")
+            datestr, desc, pay_in, pay_out, balance = [x for x in line.split("\t")]
+            day, month, year = (int(x) for x in datestr.split("/"))
             amount = self.to_pence(pay_in) if pay_in else -self.to_pence(pay_out)
             balance = self.to_pence(balance)
 
