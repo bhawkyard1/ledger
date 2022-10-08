@@ -19,6 +19,8 @@ class List(Command):
             extras.append(f"date<\"{get_date_from_string(args.end_date)}\"")
 
         parameters = " ".join(args.parameters)
+        for key, value in get_config_value(["search_groups"], {}).items():
+            parameters = parameters.replace(key, value)
         for key, value in get_config_value(["account_names"], {}).items():
             parameters = parameters.replace(value, key)
 

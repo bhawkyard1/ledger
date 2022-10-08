@@ -56,7 +56,7 @@ class Config(Command):
         if add_or_remove == "+":
             for arg in values:
                 print(arg)
-                path, value = arg.split("=")
+                path, value = arg.split("=", 1)
                 frags = path.split(":")
                 set_config_value(frags, value)
         elif add_or_remove == "-":
