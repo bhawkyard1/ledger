@@ -6,17 +6,21 @@ from ledger.command import Command
 from ledger.config import get_config_value
 from ledger.transaction import Transaction
 
+
 def chunks(lst, n):
     """Yield successive n-sized chunks from lst."""
     for i in range(0, len(lst), n):
         yield lst[i:i + n]
 
+
 class Output(Command):
     names = ("output", "o")
+
     def __call__(self, args):
         args = self.parser.parse_args(args)
         if not args.transaction_ids and not sys.stdin.isatty():
-            args.transaction_ids = [l.rstrip() for l in sys.stdin.read().split(" ")]
+            args.transaction_ids = [l.rstrip() for l in
+                                    sys.stdin.read().split(" ")]
 
         cols = [s for s in args.format_str.split(" ")]
         transactions = []
@@ -25,9 +29,19 @@ class Output(Command):
                 " OR ".join(f"uid=\"{uid}\"" for uid in chunk or [""])
             )
         data = []
-        for t in sorted(transactions, key=lambda x: tuple(getattr(x, k) for k in args.sort_by)):
-            nice_account = get_config_value(["account_names", t.account], t.account)
-            nice_description = get_config_value(["account_names", t.description], t.description)
+        for t in sorted(transactions, key=lambda x: tuple(
+                getattr(x, k) for k in args.sort_by)):
+            for key, value in get_config_value(["overrides", t.uid],
+                                               {}).items():
+                setattr(t, key, value)
+            nice_account = get_config_value(
+                ["account_names", t.account],
+                t.account
+            )
+            nice_description = get_config_value(
+                ["account_names", t.description], t.description
+            )
+
             format_dict = {
                 "date": t.date,
                 "input": nice_account if t.amount < 0 else nice_description,
@@ -40,7 +54,9 @@ class Output(Command):
                 "uid": t.uid,
                 "raw": t.tuple
             }
-            formatted = [TextColor.OKGREEN.value if t.amount >= 0 else TextColor.FAIL.value] + [s.format(**format_dict) for s in cols]
+            formatted = [
+                            TextColor.OKGREEN.value if t.amount >= 0 else TextColor.FAIL.value] + [
+                            s.format(**format_dict) for s in cols]
             data.append(formatted)
 
         if not data:
