@@ -37,7 +37,8 @@ class Output(Command):
                 "description": nice_description,
                 "balance": pence_to_pounds(t.balance),
                 "index": t.idx,
-                "uid": t.uid
+                "uid": t.uid,
+                "raw": t.tuple
             }
             formatted = [TextColor.OKGREEN.value if t.amount >= 0 else TextColor.FAIL.value] + [s.format(**format_dict) for s in cols]
             data.append(formatted)
