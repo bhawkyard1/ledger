@@ -21,11 +21,24 @@ class NationwideIngestor(Ingestor):
     }
     def _convert_currency(self, val: str) -> int:
         """ Converts a decimal string to an int representing pennies. """
+        multiplier = 1
+
+        if val[0] == "-":
+            multiplier = -1
+            val = val[1:]
+
         if val[0].isdigit():
             raise RuntimeError(f"Unexpected value {val}, must start with '£'!")
+
         val = val[1:]
+
         pounds, pennies = val.split(".")
-        return 100 * int(pounds) + int(pennies)
+        try:
+            return multiplier * 100 * int(pounds) + int(pennies)
+        except ValueError:
+            raise ValueError(
+                f"Could not convert currency for value {val}!"
+            )
 
     def _convert_transaction_type(self, val: str) -> TransactionType:
         matches = {
@@ -55,8 +68,8 @@ class NationwideIngestor(Ingestor):
 
         for idx, item in enumerate(data):
             strdate, ttype, desc, pay_out, pay_in, balance = [f.strip('"') for f in item.split(",")]
+            print(item)
             datespl = strdate.split(" ")
-            print(f"datespl {datespl}")
             day = int(datespl[0])
             month = self.months[datespl[1]]
             year = int(datespl[2])
