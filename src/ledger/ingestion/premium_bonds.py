@@ -12,31 +12,40 @@ class PremiumBondsIngestor(Ingestor):
         cnt = 0
         while i < len(self.data):
             line = self.data[i]
-            spl = [x for x in line.split("\t") if x]
-            print(spl)
-            if len(spl) != 4:
-                i += 1
-                continue
 
-            if re.match("[0-9]{2}/[0-9]{2}/[0-9]{2}", spl[0]):
-                day, month, year = [int(x) for x in spl[0].split("/")]
+            if line == "Transaction details":
+                date_str, type = self.data[i + 1].split("\t")
+                amount = self._pounds_to_pence(self.data[i + 2])
+                balance = self._pounds_to_pence(self.data[i + 3])
+
+                day, month, year = [int(x) for x in date_str.split("/")]
                 dateobj = date(year, month, day)
-                amount = self._pounds_to_pence(spl[2])
-                balance = self._pounds_to_pence(spl[3])
+
+                ttype = {
+                    "Auto prize reinvestment": TransactionType.INTEREST,
+                    "Debit card online deposit": TransactionType.DIRECT_DEBIT,
+                    "BACS payment": TransactionType.BANK_PAYMENT
+                }[type.strip()]
 
                 transactions.append(
                     Transaction(
                         idx=cnt,
                         date=dateobj,
                         account="PREMIUM_BONDS",
-                        ttype=TransactionType.ONLINE_DEBIT_CARD_PAYMENT,
+                        ttype=ttype,
                         description="PREMIUM_BONDS_LINKED_ACCOUNT",
-                        amount=amount,
+                        amount=(
+                            -amount if ttype == TransactionType.BANK_PAYMENT
+                            else amount
+                        ),
                         balance=balance
                     )
                 )
                 cnt += 1
-            i += 1
+
+                i += 3
+            else:
+                i += 1
 
         for t in transactions:
             print(t)
