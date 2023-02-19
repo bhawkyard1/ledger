@@ -118,12 +118,12 @@ def print_columns(data):
     for col in range(len(data[0])):
         maxlen = 0
         for row in data:
-            lencol = len(row[col]) + 1
+            lencol = len(remove_colors(row[col])) + 1
             if lencol > maxlen:
                 maxlen = lencol
 
         for row in data:
-            diff = maxlen - len(row[col])
+            diff = maxlen - len(remove_colors(row[col]))
             row[col] += " " * diff
 
     for row in data:

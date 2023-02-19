@@ -67,10 +67,20 @@ class Transaction(Serializable):
             return False
 
     def __str__(self):
+        return " ".join(self.str_tuple())
+
+    def str_tuple(self):
         abs_amount = abs(self.amount)
         if self.amount < 0:
-            return f"{self.date}: {self.nice_account_name} -> {pence_to_pounds(abs_amount)} -> {self.nice_description} (={pence_to_pounds(self.balance)})"
-        return f"{self.date}: {self.nice_description} -> {pence_to_pounds(abs_amount)} -> {self.nice_account_name} (={pence_to_pounds(self.balance)})"
+            return (str(self.date), ":", self.nice_account_name, "->",
+                    pence_to_pounds(abs_amount), "->", self.nice_description,
+                    f"(={pence_to_pounds(self.balance)})"
+                    )
+
+        return (str(self.date), ":", self.nice_description, "->",
+                pence_to_pounds(abs_amount), "->", self.nice_account_name,
+                f"(={pence_to_pounds(self.balance)})"
+                )
 
     @property
     def hash_data(self):

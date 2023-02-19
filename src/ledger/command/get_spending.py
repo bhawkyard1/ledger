@@ -56,6 +56,7 @@ class GetSpending(Command):
             )
         spending_by_account = defaultdict(int)
         running_total = 0
+        details = []
         for t in sorted(relevant_transactions):
             if(
                 t.amount < 0 and
@@ -64,15 +65,29 @@ class GetSpending(Command):
             ):
                 running_total -= t.amount
                 if print_details:
-                    print(f"{TextColor.FAIL.value}ADDING:   {t} : {pence_to_pounds(running_total)}")
+                    details.append(
+                        [f"{TextColor.FAIL.value}ADDING"]
+                        + [x for x in t.str_tuple()]
+                        + [":", pence_to_pounds(running_total)]
+                    )
                 spending_by_account[t.nice_account_name] -= t.amount
             elif t.description in get_config_value(["payback_descriptions"]):
                 running_total -= t.amount
                 if print_details:
-                    print(f"{TextColor.OKGREEN.value}PAYBACK:  {t} : {pence_to_pounds(running_total)}")
+                    details.append(
+                        [f"{TextColor.OKGREEN.value}PAYBACK"]
+                        + [x for x in t.str_tuple()]
+                        + [":", pence_to_pounds(running_total)]
+                    )
                 spending_by_account[t.nice_account_name] -= t.amount
             elif print_details:
-                print(f"{TextColor.ENDC.value}IGNORING: {t} : {pence_to_pounds(running_total)}")
+                details.append([f"{TextColor.ENDC.value}IGNORING"] +
+                               [x for x in t.str_tuple()] +
+                               [":", pence_to_pounds(running_total)]
+                )
+
+        if details:
+            print_columns(details)
 
         data = []
         # print(spending_by_account)
