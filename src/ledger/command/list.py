@@ -30,6 +30,9 @@ class List(Command):
         else:
             parameters = ' AND '.join(extras)
 
+        if args.debug:
+            print(parameters)
+
         transactions = []
         for t in sorted(Transaction.filter(parameters), key=lambda x: (x.date, x.idx)):
             transactions.append(t)
@@ -42,6 +45,7 @@ class List(Command):
             prog=f"{sys.argv[0]} {self.names[0]}"
         )
         parser.add_argument("parameters", type=str, nargs="*")
+        parser.add_argument("--debug", action="store_true")
         parser.add_argument("--start-date", "-sd", type=str, help="Date to start searching (inclusive).")
         parser.add_argument("--end-date", "-ed", type=str, help="Date to stop searching (non-inclusive).")
         return parser
