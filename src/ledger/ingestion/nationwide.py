@@ -60,7 +60,7 @@ class NationwideIngestor(Ingestor):
         super(NationwideIngestor, self).ingest()
         transactions = []
         data = self.data
-        account = data[0].split(",")[1]
+        account = data[0].split(",")[1].replace('"', "")
         if len(data) < 5: # Data starts on line 6
             return
         data = data[5:]
