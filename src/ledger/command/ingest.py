@@ -27,7 +27,16 @@ class Ingest(Command):
                     transactions += inst.ingest()
                     break
             else:
-                raise RuntimeError(f"Could not find a suitable class to ingest {path}!")
+                raise RuntimeError(
+                    "Could not find a suitable class to ingest {}! "
+                    "Available classes "
+                    "are\n\t{}".format(
+                        path,
+                        "\n\t".join(
+                            cls.__name__ for cls in Ingestor.allSubclasses()
+                        )
+                    )
+                )
 
         Transaction.batch_serialize(transactions)
         # for t in transactions:
@@ -52,6 +61,7 @@ from ledger.ingestion import amex
 from ledger.ingestion import lloyds
 from ledger.ingestion import lloyds_credit
 from ledger.ingestion import nationwide
+from ledger.ingestion import natwest
 from ledger.ingestion import premium_bonds
 from ledger.ingestion import vanguard
 from ledger.ingestion import skipton
