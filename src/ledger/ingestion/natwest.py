@@ -54,6 +54,8 @@ class NationwideIngestor(Ingestor):
                                               quotechar='"')):
             strdate, ttype, desc, value, balance, acct_name, acct_number = item
             desc = ", ".join([frag.strip() for frag in desc.split(",")])
+            if len(desc) > 24:
+                desc = desc[:24]
             datespl = strdate.split("/")
             day = int(datespl[0])
             month = int(datespl[1])
