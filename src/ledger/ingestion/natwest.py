@@ -6,7 +6,20 @@ from ledger.transaction import Transaction, TransactionType
 
 
 class NationwideIngestor(Ingestor):
-
+    months = {
+        "Jan": 1,
+        "Feb": 2,
+        "Mar": 3,
+        "Apr": 4,
+        "May": 5,
+        "Jun": 6,
+        "Jul": 7,
+        "Aug": 8,
+        "Sep": 9,
+        "Oct": 10,
+        "Nov": 11,
+        "Dec": 12
+    }
     def _convert_currency(self, val: str) -> int:
         """ Converts a decimal string to an int representing pennies. """
         multiplier = 1
@@ -44,21 +57,28 @@ class NationwideIngestor(Ingestor):
     def ingest(self):
         super(NationwideIngestor, self).ingest()
         transactions = []
-        data = self.data
-        if len(data) < 4:  # Data starts on line 6
+
+        for i, line in enumerate(self.data):
+            if line.split()[0].isdigit():
+                start_idx = i
+                break
+        else:
+            start_idx = None
+
+        if start_idx is None:
             return
-        data = data[4:]
-        print(f"data is {data}")
+        data = self.data[start_idx:]
 
         for idx, item in enumerate(csv.reader(data, delimiter=',',
                                               quotechar='"')):
+            print(idx, item)
             strdate, ttype, desc, value, balance, acct_name, acct_number = item
             desc = ", ".join([frag.strip() for frag in desc.split(",")])
             if len(desc) > 24:
                 desc = desc[:24]
-            datespl = strdate.split("/")
+            datespl = strdate.split(" ")
             day = int(datespl[0])
-            month = int(datespl[1])
+            month = self.months[datespl[1]]
             year = int(datespl[2])
 
             dateobj = date(year, month, day)
