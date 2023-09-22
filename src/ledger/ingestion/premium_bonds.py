@@ -24,7 +24,7 @@ class PremiumBondsIngestor(Ingestor):
                 ttype = {
                     "Auto prize reinvestment": TransactionType.INTEREST,
                     "Debit card online deposit": TransactionType.DIRECT_DEBIT,
-                    "BACS payment": TransactionType.BANK_PAYMENT,
+                    "BACS payment": TransactionType.BANK_TRANSFER,
                     "Faster Payment deposit": TransactionType.BANK_PAYMENT
                 }[type.strip()]
 
@@ -36,7 +36,7 @@ class PremiumBondsIngestor(Ingestor):
                         ttype=ttype,
                         description="PREMIUM_BONDS_LINKED_ACCOUNT",
                         amount=(
-                            -amount if ttype == TransactionType.BANK_PAYMENT
+                            -amount if ttype == TransactionType.BANK_TRANSFER
                             else amount
                         ),
                         balance=balance
