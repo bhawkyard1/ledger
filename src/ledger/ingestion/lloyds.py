@@ -15,6 +15,7 @@ class LLoydsIngestor(Ingestor):
         "DEB": TransactionType.DEBIT_CARD_PAYMENT,
         "BGC": TransactionType.WAGES,
         "FPO": TransactionType.BANK_TRANSFER,
+        "TFR": TransactionType.WAGES,
         "": TransactionType.NULL
     }
 
